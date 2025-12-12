@@ -69,7 +69,7 @@
         >
           <div>
             <h3>{{ company.companyName }}</h3>
-            <p class="code">Код: {{ company.companyCode }}</p>
+<!--            <p class="code">Код: {{ company.companyCode }}</p>-->
           </div>
 
           <a

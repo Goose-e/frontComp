@@ -116,7 +116,7 @@
           <input
               id="otzovikUrl"
               v-model="newCompany.otzovikUrl"
-              placeholder="https://otzovik.com/..."
+              placeholder="https://otzovik.by/..."
           />
           <p class="help-text">
             Отзовик не найден, укажите ссылку вручную для последующего поиска.
