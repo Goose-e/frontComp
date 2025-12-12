@@ -93,7 +93,7 @@
 
 
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import api from "../api/http.js";
 
@@ -101,6 +101,7 @@ const router = useRouter();
 const allUserCompanies = ref([]);
 const loading = ref(false);
 const statusMessage = ref("");
+let refreshTimer = null;
 
 // ошибки
 const errorName = ref("");
@@ -168,7 +169,8 @@ const addCompany = async () => {
 const getAllCompanies = async () => {
   try {
     const res = await api.get("company/get_all_for_user");
-    allUserCompanies.value = res.data.responseEntity.allCompanies;
+    const raw = res.data.responseEntity?.allCompanies ?? [];
+    allUserCompanies.value = Array.isArray(raw) ? raw : Object.values(raw);
   } catch (err) {
     console.error("Ошибка получения компаний:", err);
   }
@@ -181,6 +183,12 @@ const toCompanyPage = (code) => {
 onMounted(() => {
   if (!localStorage.getItem("accessToken")) router.push("/");
   getAllCompanies();
+
+  refreshTimer = setInterval(getAllCompanies, 15000);
+});
+
+onBeforeUnmount(() => {
+  if (refreshTimer) clearInterval(refreshTimer);
 });
 </script>
 
