@@ -166,11 +166,40 @@ const addCompany = async () => {
   }
 };
 
+const normalizeCompanies = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+
+  const isCompany =
+      typeof data === "object" &&
+      data !== null &&
+      "companyCode" in data &&
+      "companyName" in data;
+
+  if (isCompany) return [data];
+
+  if (typeof data === "object") {
+    return Object.values(data).flatMap((item) => normalizeCompanies(item));
+  }
+
+  return [];
+};
+
 const getAllCompanies = async () => {
   try {
     const res = await api.get("company/get_all_for_user");
     const raw = res.data.responseEntity?.allCompanies ?? [];
-    allUserCompanies.value = Array.isArray(raw) ? raw : Object.values(raw);
+    const normalized = normalizeCompanies(raw);
+
+    // Убираем дубликаты по коду компании
+    const uniqMap = new Map();
+    normalized.forEach((item) => {
+      if (item?.companyCode && !uniqMap.has(item.companyCode)) {
+        uniqMap.set(item.companyCode, item);
+      }
+    });
+
+    allUserCompanies.value = Array.from(uniqMap.values());
   } catch (err) {
     console.error("Ошибка получения компаний:", err);
   }
