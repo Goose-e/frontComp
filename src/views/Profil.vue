@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="profile" ref="profileEl">
     <header class="page-header">
       <router-link :to="{ name: 'main' }" class="pill">← На главную</router-link>
       <router-link :to="{ name: 'UserCompanies' }" class="pill">Компании пользователя</router-link>
@@ -61,18 +61,27 @@
 
     </div>
 
+  </div >
+  <div class="center-text" :style="{ top: centerTop + 'px' }">
+    {{ funText }}
   </div>
-  <button class="btn-class-name">
-    <span class="back"></span>
-    <span class="front"></span>
-  </button>
+
+  <!-- FAB -->
+  <div class="fab-container">
+    <button class="btn-class-name" @click="incrementClicks">
+      <span class="back"></span>
+      <span class="front">{{ clickCount }}</span>
+    </button>
+  </div>
+
+
 </template>
 
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import api from "../api/http.js";
-import { useRouter } from "vue-router";
+import {useRouter} from "vue-router";
 
 const router = useRouter();
 
@@ -99,6 +108,24 @@ const isValidEmail = (email) => {
   if (!email) return true;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
+//hihi haha
+const profileEl = ref(null);
+const centerTop = ref(200);
+const clickCount = ref(0);
+const incrementClicks = () => {
+  clickCount.value++;
+};
+const safeTop = rect.bottom + 24;
+const screenMiddle = window.innerHeight / 2;
+centerTop.value = Math.max(safeTop, screenMiddle);
+const funText = computed(() => {
+  if (loading.value) return "";
+  if (clickCount.value === 0) return "Нажми кнопку";
+  if (clickCount.value < 5) return "Неплохо 🙂";
+  if (clickCount.value < 10) return "Ты втянулся 😄";
+  if (clickCount.value < 20) return "Ого, остановись 😅";
+  return "Ладно, ты победил 🏆";
+});
 
 const resetForm = () => {
   editUserForm.newUsername = "";
@@ -161,9 +188,13 @@ onMounted(() => {
     return;
   }
   getUser();
+  updateCenterTop();
+  window.addEventListener("resize", updateCenterTop);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateCenterTop);
 });
 </script>
-
 
 
 <style scoped>
@@ -191,7 +222,9 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.pill:hover { border-color: rgba(255, 255, 255, 0.2); }
+.pill:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
 .welcome {
   display: flex;
@@ -215,6 +248,35 @@ onMounted(() => {
   color: white;
   font-size: 1.2rem;
 }
+.fab-container {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  display: flex;
+  justify-content: center;
+}
+
+.center-text {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #cdd6e3;
+  text-align: center;
+  max-width: 900px;
+  padding: 0 16px;
+
+  pointer-events: none;
+}
+
+
+
 /* From Uiverse.io by catraco */
 .btn-class-name {
   position: fixed;
@@ -272,8 +334,18 @@ onMounted(() => {
   transform: translateY(0%);
   box-shadow: 0 0;
 }
-.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 0; }
-.muted { color: #cdd6e3; margin: 6px 0 0; }
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9fb3d4;
+  margin: 0;
+}
+
+.muted {
+  color: #cdd6e3;
+  margin: 6px 0 0;
+}
 
 .card {
   margin-top: 18px;
@@ -284,8 +356,15 @@ onMounted(() => {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
 }
 
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.card-header h2 { margin: 6px 0 0; }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  margin: 6px 0 0;
+}
 
 .tag {
   padding: 6px 12px;
@@ -302,7 +381,10 @@ onMounted(() => {
   margin-top: 16px;
 }
 
-label { color: #cdd6e3; font-size: 0.95rem; }
+label {
+  color: #cdd6e3;
+  font-size: 0.95rem;
+}
 
 .form-input {
   width: 100%;
@@ -321,7 +403,12 @@ label { color: #cdd6e3; font-size: 0.95rem; }
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
-.actions { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
 .primary, .ghost {
   padding: 12px 16px;
@@ -343,8 +430,13 @@ label { color: #cdd6e3; font-size: 0.95rem; }
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.primary:hover { transform: translateY(-1px); }
-.ghost:hover { border-color: rgba(255, 255, 255, 0.2); }
+.primary:hover {
+  transform: translateY(-1px);
+}
+
+.ghost:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
 .error {
   color: #fca5a5;
