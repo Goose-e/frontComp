@@ -53,6 +53,7 @@
               <span v-if="!loading">Добавить</span>
               <span v-else>Загрузка...</span>
             </button>
+            <p v-if="statusMessage" class="info">{{ statusMessage }}</p>
           </div>
         </div>
 
@@ -99,6 +100,7 @@ import api from "../api/http.js";
 const router = useRouter();
 const allUserCompanies = ref([]);
 const loading = ref(false);
+const statusMessage = ref("");
 
 // ошибки
 const errorName = ref("");
@@ -131,6 +133,7 @@ const addCompany = async () => {
 
   try {
     loading.value = true;
+    statusMessage.value = "";
 
     const body = {
       companyName: newCompany.companyName,
@@ -151,7 +154,9 @@ const addCompany = async () => {
     newCompany.industryName = "";
     newCompany.website = "";
 
-    getAllCompanies();
+    statusMessage.value = "Компания создается. Пожалуйста, подождите обновления списка.";
+    await getAllCompanies();
+    statusMessage.value = "Компания добавлена. Список обновлен.";
   } catch (err) {
     console.error("Ошибка:", err);
     errorName.value = "Произошла ошибка. Попробуйте снова.";
@@ -242,6 +247,7 @@ input:focus {
 .ghost:hover { border-color: rgba(255, 255, 255, 0.2); }
 
 .error { color: #fca5a5; font-size: 0.9rem; }
+.info { color: #9fb3d4; font-size: 0.9rem; margin: 2px 0 0; }
 
 .companies-block { margin-top: 8px; }
 .block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
