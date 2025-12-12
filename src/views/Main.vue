@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <header class="topbar">
-      <div class="brand">Insight<span>Hub</span></div>
+      <router-link :to="{ name: 'main' }" class="brand">Insight<span>Hub</span></router-link>
 
       <div class="nav-actions">
         <router-link
@@ -199,6 +199,8 @@ onMounted(() => {
   font-weight: 700;
   font-size: 1.4rem;
   letter-spacing: 0.02em;
+  color: var(--text);
+  text-decoration: none;
 }
 
 .brand span { color: var(--accent); }
