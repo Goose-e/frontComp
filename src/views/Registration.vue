@@ -111,8 +111,22 @@ const addUser = async () => {
   errorUsername.value = "";
   errorEmail.value = "";
 
-  if (!newUser.name.trim() || !newUser.email.trim() || !newUser.password.trim()) {
-    errorEmail.value = "Все поля обязательны.";
+  if (!newUser.name.trim()) {
+    errorUsername.value = "Логин обязателен.";
+  }
+
+  if (!newUser.email.trim()) {
+    errorEmail.value = "Введите email.";
+  }
+
+  if (!newUser.password.trim()) {
+    errorEmail.value = "Пароль обязателен.";
+  }
+
+  if (errorUsername.value || errorEmail.value) return;
+
+  if (newUser.name.trim().length < 3 || newUser.name.trim().length > 20) {
+    errorUsername.value = "Логин должен содержать от 3 до 20 символов.";
     return;
   }
 
