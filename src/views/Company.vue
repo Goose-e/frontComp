@@ -130,11 +130,37 @@
       <h2>Отзывы</h2>
 
       <div class="reviews-buttons">
-        <button @click="getAllReviewsBySentType('1')">Положительные</button>
-        <button @click="getAllReviewsBySentType('2')">Нейтральные</button>
-        <button @click="getAllReviewsBySentType('3')">Негативные</button>
-        <button @click="getAllReviewsBySentType('4')">Без оценки</button>
-        <button class="all" @click="getReviews">Все</button>
+        <button
+            :class="{ active: activeSentiment === '1' }"
+            @click="getAllReviewsBySentType('1')"
+        >
+          Положительные
+        </button>
+        <button
+            :class="{ active: activeSentiment === '2' }"
+            @click="getAllReviewsBySentType('2')"
+        >
+          Нейтральные
+        </button>
+        <button
+            :class="{ active: activeSentiment === '3' }"
+            @click="getAllReviewsBySentType('3')"
+        >
+          Негативные
+        </button>
+        <button
+            :class="{ active: activeSentiment === '4' }"
+            @click="getAllReviewsBySentType('4')"
+        >
+          Без оценки
+        </button>
+        <button
+            class="all"
+            :class="{ active: activeSentiment === 'all' }"
+            @click="getReviews"
+        >
+          Все
+        </button>
       </div>
 
       <div v-if="reviews.length">
@@ -179,6 +205,7 @@ const router = useRouter();
 const company = ref(null);
 const companyUsers = ref([]);
 const reviews = ref([]);
+const activeSentiment = ref("all");
 const usernameToAdd = ref("");
 const chartImage = ref("");
 const userInfo = ref(null);
@@ -224,6 +251,7 @@ const getReviews = async () => {
     reviews.value = [];
   } finally {
     currentPage.value = 1;
+    activeSentiment.value = "all";
   }
 };
 
@@ -241,6 +269,7 @@ const getAllReviewsBySentType = async (sentId) => {
     reviews.value = [];
   } finally {
     currentPage.value = 1;
+    activeSentiment.value = sentId;
   }
 };
 
@@ -362,15 +391,23 @@ const generateReport = async () => {
         { responseType: "arraybuffer" }
     );
 
+    const contentType = res.headers?.["content-type"] || "";
     let blob;
-    if (res.data instanceof ArrayBuffer) {
+
+    const buildPdfFromBase64 = (base64) => {
+      if (!base64) throw new Error("Нет данных отчёта");
+      const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      return new Blob([byteArray], { type: "application/pdf" });
+    };
+
+    if (contentType.includes("application/json")) {
+      const text = new TextDecoder().decode(res.data);
+      const parsed = JSON.parse(text);
+      blob = buildPdfFromBase64(parsed.responseEntity?.reportImg);
+    } else if (res.data instanceof ArrayBuffer) {
       blob = new Blob([res.data], { type: "application/pdf" });
     } else {
-      const base64 = res.data.responseEntity?.reportImg;
-      if (!base64) throw new Error("Нет данных отчёта");
-
-      const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-      blob = new Blob([byteArray], { type: "application/pdf" });
+      blob = buildPdfFromBase64(res.data?.responseEntity?.reportImg);
     }
 
     const url = URL.createObjectURL(blob);
@@ -518,6 +555,7 @@ h1 { margin: 4px 0 6px; }
 
 .reviews-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 .reviews-buttons button { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+.reviews-buttons button.active { border-color: rgba(37, 99, 235, 0.6); background: rgba(37, 99, 235, 0.2); }
 .reviews-buttons .all { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; }
 
 .review-item { background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.08); }
