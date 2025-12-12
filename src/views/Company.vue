@@ -127,7 +127,20 @@
 
     <!-- REVIEWS FILTER -->
     <div class="card glass">
-      <h2>Отзывы</h2>
+      <div class="reviews-head">
+        <h2>Отзывы</h2>
+        <div class="actions">
+          <button
+              class="primary"
+              @click="findReviews"
+              :disabled="reviewSearchLoading"
+          >
+            <span v-if="!reviewSearchLoading">Запустить поиск отзывов</span>
+            <span v-else>Запуск...</span>
+          </button>
+          <p v-if="reviewSearchMessage" class="status-text">{{ reviewSearchMessage }}</p>
+        </div>
+      </div>
 
       <div class="reviews-buttons">
         <button
@@ -209,6 +222,8 @@ const activeSentiment = ref("all");
 const usernameToAdd = ref("");
 const chartImage = ref("");
 const userInfo = ref(null);
+const reviewSearchMessage = ref("");
+const reviewSearchLoading = ref(false);
 
 const currentPage = ref(1);
 const pageSize = 6;
@@ -252,6 +267,25 @@ const getReviews = async () => {
   } finally {
     currentPage.value = 1;
     activeSentiment.value = "all";
+  }
+};
+
+const findReviews = async () => {
+  try {
+    reviewSearchLoading.value = true;
+    reviewSearchMessage.value = "";
+
+    await api.post("review/find_reviews", {
+      companyCode: route.params.code,
+    });
+
+    reviewSearchMessage.value = "Поиск отзывов запущен";
+    await getReviews();
+  } catch (err) {
+    console.error("Не удалось запустить поиск отзывов", err);
+    reviewSearchMessage.value = "Не удалось запустить поиск";
+  } finally {
+    reviewSearchLoading.value = false;
   }
 };
 
@@ -557,6 +591,23 @@ h1 { margin: 4px 0 6px; }
 .reviews-buttons button { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
 .reviews-buttons button.active { border-color: rgba(37, 99, 235, 0.6); background: rgba(37, 99, 235, 0.2); }
 .reviews-buttons .all { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; }
+
+.reviews-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reviews-head .actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.status-text { color: #9fb3d4; margin: 0; }
 
 .review-item { background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.08); }
 
