@@ -105,12 +105,23 @@
     </div>
 
     <!-- EDIT COMPANY -->
-    <div class="card glass">
+  <div class="card glass">
       <h2>Редактировать компанию</h2>
 
       <div class="edit-grid">
         <input v-model="newCompany.industryName" placeholder="Отрасль" />
         <input v-model="newCompany.website" placeholder="Сайт" />
+        <div v-if="isOtzovikMissing" class="otzovik-field">
+          <label for="otzovikUrl">Ссылка на Отзовик</label>
+          <input
+              id="otzovikUrl"
+              v-model="newCompany.otzovikUrl"
+              placeholder="https://otzovik.com/..."
+          />
+          <p class="help-text">
+            Отзовик не найден, укажите ссылку вручную для последующего поиска.
+          </p>
+        </div>
       </div>
       <button class="primary" @click="editCompany">Сохранить</button>
     </div>
@@ -234,6 +245,10 @@ const chartImage = ref("");
 const userInfo = ref(null);
 const reviewSearchMessage = ref("");
 const reviewSearchLoading = ref(false);
+const isOtzovikMissing = computed(() => {
+  const url = company.value?.otzovikUrl?.toLowerCase?.();
+  return !url || url === "не найдено";
+});
 
 const currentPage = ref(1);
 const pageSize = 6;
@@ -248,6 +263,7 @@ const websiteLink = computed(() => {
 const newCompany = reactive({
   industryName: "",
   website: "",
+  otzovikUrl: "",
 });
 
 const charts = ref([]);
@@ -381,11 +397,16 @@ const editCompany = async () => {
     companyCode: route.params.code,
     newCompanyIndustry: newCompany.industryName || null,
     newCompanyWebsite: newCompany.website || null,
+    newOtzovikUrl:
+        isOtzovikMissing.value && newCompany.otzovikUrl
+            ? newCompany.otzovikUrl
+            : null,
   });
 
   getCompanyByCode();
   newCompany.industryName = "";
   newCompany.website = "";
+  newCompany.otzovikUrl = "";
 };
 
 const changeCompanyStatus = async (newStatusId) => {
@@ -645,6 +666,8 @@ h1 { margin: 4px 0 6px; }
 .row { display: flex; gap: 12px; flex-wrap: wrap; }
 
 .edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 10px 0 12px; }
+.otzovik-field { display: flex; flex-direction: column; gap: 6px; }
+.help-text { margin: 0; color: #9fb3d4; font-size: 0.9rem; }
 
 @media (max-width: 640px) {
   .hero { flex-direction: column; }
