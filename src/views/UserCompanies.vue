@@ -1,62 +1,90 @@
 <template>
-  <div class="top-bar">
-    <router-link :to="{ name: 'profil' }" class="nav-btn">Профиль</router-link>
-    <router-link :to="{ name: 'main' }" class="nav-btn">Главная</router-link>
-  </div>
-
-  <div class="page">
-
-    <!-- Форма создания компании -->
-    <div class="create-card">
-      <h1>Создать компанию</h1>
-
-      <div class="form">
-        <input
-            v-model="newCompany.companyName"
-            type="text"
-            placeholder="Название компании *"
-        />
-        <p v-if="errorName" class="error">{{ errorName }}</p>
-
-        <input
-            v-model="newCompany.industryName"
-            type="text"
-            placeholder="Отрасль (необязательно)"
-        />
-
-        <input
-            v-model="newCompany.website"
-            type="text"
-            placeholder="Сайт (необязательно)"
-        />
-        <p v-if="errorWebsite" class="error">{{ errorWebsite }}</p>
-
-        <button :disabled="loading" @click="addCompany">
-          <span v-if="!loading">Добавить</span>
-          <span v-else>Загрузка...</span>
-        </button>
+  <div class="page-shell">
+    <header class="top-bar">
+      <div class="title">
+        <p class="eyebrow">Ваше пространство</p>
+        <h1>Компании пользователя</h1>
       </div>
-    </div>
+      <div class="links">
+        <router-link :to="{ name: 'main' }" class="pill">Главная</router-link>
+        <router-link :to="{ name: 'profil' }" class="pill">Профиль</router-link>
+      </div>
+    </header>
 
-    <!-- Компании пользователя -->
-    <div class="companies-block">
-      <h2>Ваши компании</h2>
+    <div class="page">
 
-      <div class="companies-grid">
-        <div
-            v-for="company in allUserCompanies"
-            :key="company.companyCode"
-            class="company-card"
-            @click="toCompanyPage(company.companyCode)"
-        >
-          <h3>{{ company.companyName }}</h3>
-          <small>{{ company.companyCode }}</small>
+      <div class="grid">
+        <!-- Форма создания компании -->
+        <div class="create-card glass">
+          <p class="eyebrow">Новая компания</p>
+          <h2>Создать карточку</h2>
 
-          <button class="open-btn">Открыть</button>
+          <div class="form">
+            <div>
+              <label>Название *</label>
+              <input
+                  v-model="newCompany.companyName"
+                  type="text"
+                  placeholder="Название компании"
+              />
+              <p v-if="errorName" class="error">{{ errorName }}</p>
+            </div>
+
+            <div>
+              <label>Отрасль</label>
+              <input
+                  v-model="newCompany.industryName"
+                  type="text"
+                  placeholder="Например, IT или Ритейл"
+              />
+            </div>
+
+            <div>
+              <label>Сайт</label>
+              <input
+                  v-model="newCompany.website"
+                  type="text"
+                  placeholder="https://example.com"
+              />
+              <p v-if="errorWebsite" class="error">{{ errorWebsite }}</p>
+            </div>
+
+            <button :disabled="loading" @click="addCompany" class="primary">
+              <span v-if="!loading">Добавить</span>
+              <span v-else>Загрузка...</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Компании пользователя -->
+        <div class="companies-block glass">
+          <div class="block-head">
+            <div>
+              <p class="eyebrow">Список</p>
+              <h2>Ваши компании</h2>
+            </div>
+            <span class="pill" v-if="allUserCompanies.length">{{ allUserCompanies.length }} шт.</span>
+          </div>
+
+          <div class="companies-grid">
+            <div
+                v-for="company in allUserCompanies"
+                :key="company.companyCode"
+                class="company-card"
+                @click="toCompanyPage(company.companyCode)"
+            >
+              <div>
+                <h3>{{ company.companyName }}</h3>
+                <small>{{ company.companyCode }}</small>
+              </div>
+
+              <button class="ghost">Открыть</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </template>
 
@@ -156,130 +184,88 @@ onMounted(() => {
 
 
 <style scoped>
-/* Верхняя панель */
-.top-bar {
-  display: flex;
-  justify-content: flex-start;
-  background: #1976d2;
-  padding: 0.8rem 1.5rem;
-  gap: 1rem;
+.page-shell { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; color: var(--text); }
+
+.top-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.title h1 { margin: 6px 0 0; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 0; }
+
+.links { display: flex; gap: 10px; }
+.pill { padding: 10px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text); text-decoration: none; font-weight: 600; }
+.pill:hover { border-color: rgba(255, 255, 255, 0.2); }
+
+.page { margin-top: 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+.glass {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
 }
 
-.nav-btn {
-  color: white;
-  font-weight: 600;
-  text-decoration: none;
-  transition: 0.3s;
-}
-.nav-btn:hover {
-  color: #bbdefb;
-}
+.form { display: grid; gap: 12px; margin-top: 12px; }
+label { color: #cdd6e3; font-size: 0.95rem; }
 
-/* Основная страница */
-.page {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: auto;
-}
-
-/* Блок создания компании */
-.create-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  max-width: 420px;
-  margin: 0 auto 2rem auto;
-  text-align: center;
-}
-
-.create-card h1 {
-  margin-bottom: 1.5rem;
-}
-
-.form input {
+input {
   width: 100%;
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid #cfd8dc;
-  margin-bottom: 0.5rem;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
   transition: 0.2s;
 }
-.form input:focus {
-  border-color: #1976d2;
-  box-shadow: 0 0 6px rgba(25,118,210,0.4);
+
+input:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
-.form button {
-  width: 100%;
-  margin-top: 0.5rem;
-  padding: 0.8rem;
-  background: #1976d2;
-  color: white;
+.primary,
+.ghost {
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: 0.25s;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
   cursor: pointer;
-}
-.form button:hover:not(:disabled) {
-  background: #1565c0;
-}
-.form button:disabled {
-  background: #90caf9;
-  cursor: not-allowed;
+  color: var(--text);
+  transition: 0.2s;
 }
 
-.error {
-  color: #d32f2f;
-  font-size: 0.85rem;
-  text-align: left;
-}
+.primary { background: linear-gradient(135deg, #2563eb, #7c3aed); box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3); }
+.ghost { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+.primary:hover { transform: translateY(-1px); }
+.ghost:hover { border-color: rgba(255, 255, 255, 0.2); }
 
-/* Список компаний */
-.companies-block h2 {
-  margin-bottom: 1rem;
-  text-align: center;
-}
+.error { color: #fca5a5; font-size: 0.9rem; }
 
-.companies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-  gap: 1rem;
-}
+.companies-block { margin-top: 8px; }
+.block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.companies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 
 .company-card {
-  background: white;
-  padding: 1.3rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
-  transition: 0.25s;
-  text-align: center;
-}
-.company-card:hover {
-  transform: scale(1.03);
-}
-
-.company-card h3 {
-  margin-bottom: 0.4rem;
-}
-
-.company-card small {
-  color: #666;
-}
-
-.open-btn {
-  margin-top: 0.8rem;
-  padding: 0.5rem 1rem;
-  background: #64b5f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
   transition: 0.2s;
 }
-.open-btn:hover {
-  background: #42a5f5;
+
+.company-card:hover { transform: translateY(-3px); border-color: rgba(37, 99, 235, 0.4); }
+
+small { color: #9fb3d4; }
+
+@media (max-width: 640px) {
+  .links { width: 100%; justify-content: flex-start; }
 }
 </style>
 

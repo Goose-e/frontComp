@@ -1,23 +1,40 @@
 <template>
   <div class="page-container">
 
-    <div class="header">
-      <router-link :to="{ name: 'main' }" class="back">← Назад</router-link>
-      <h1>{{ company?.companyName || "Загрузка..." }}</h1>
-      <p class="subtitle">{{ company?.industry || "Без отрасли" }}</p>
+    <div class="hero">
+      <div>
+        <router-link :to="{ name: 'main' }" class="pill">← Назад</router-link>
+        <p class="eyebrow">Страница компании</p>
+        <h1>{{ company?.companyName || "Загрузка..." }}</h1>
+        <p class="subtitle">{{ company?.industry || "Без отрасли" }}</p>
+      </div>
+      <div class="status" v-if="company?.companyStatus">{{ company.companyStatus }}</div>
     </div>
 
     <!-- COMPANY INFO -->
-    <div v-if="company" class="card company-info">
-      <h2>{{ company.companyName }}</h2>
+    <div v-if="company" class="card company-info glass">
+      <div class="card-header">
+        <div>
+          <p class="eyebrow">Детали</p>
+          <h2>{{ company.companyName }}</h2>
+        </div>
+        <div class="badge" v-if="company.industry">{{ company.industry }}</div>
+      </div>
 
-      <p v-if="company.companyStatus">
-        <strong>Статус:</strong> {{ company.companyStatus }}
-      </p>
-
-      <p v-if="company.industry">
-        <strong>Отрасль:</strong> {{ company.industry }}
-      </p>
+      <div class="info-grid">
+        <div>
+          <span class="label">Статус</span>
+          <p class="value">{{ company.companyStatus || '—' }}</p>
+        </div>
+        <div>
+          <span class="label">Код компании</span>
+          <p class="value">{{ company.companyCode }}</p>
+        </div>
+        <div>
+          <span class="label">Сайт</span>
+          <p class="value">{{ company.website || 'Не указан' }}</p>
+        </div>
+      </div>
 
       <a
           v-if="company.otzovikUrl && company.otzovikUrl !== 'не найдено'"
@@ -31,7 +48,7 @@
 
 
     <!-- USERS BLOCK -->
-    <div class="card">
+    <div class="card glass">
       <h2>Участники компании</h2>
 
       <div class="users-grid">
@@ -55,7 +72,7 @@
                 <option value="Actual">Активный</option>
                 <option value="Closed">Неактивный</option>
               </select>
-              <button @click="updateUserStatus(user)">Сохранить</button>
+              <button class="ghost" @click="updateUserStatus(user)">Сохранить</button>
             </div>
 
             <div>
@@ -64,7 +81,7 @@
                 <option value="USER">Участник</option>
                 <option value="ADMIN">Админ</option>
               </select>
-              <button @click="changeUserRole(user)">Сохранить</button>
+              <button class="ghost" @click="changeUserRole(user)">Сохранить</button>
             </div>
           </div>
         </div>
@@ -73,27 +90,29 @@
       <!-- Добавить пользователя -->
       <div class="add-user">
         <input type="text" v-model="usernameToAdd" placeholder="Имя пользователя" />
-        <button @click="addUserToCompany(usernameToAdd)">Добавить</button>
+        <button class="primary" @click="addUserToCompany(usernameToAdd)">Добавить</button>
       </div>
     </div>
 
     <!-- EDIT COMPANY -->
-    <div class="card">
+    <div class="card glass">
       <h2>Редактировать компанию</h2>
 
-      <input v-model="newCompany.industryName" placeholder="Отрасль" />
-      <input v-model="newCompany.website" placeholder="Сайт" />
-      <button @click="editCompany">Сохранить</button>
+      <div class="edit-grid">
+        <input v-model="newCompany.industryName" placeholder="Отрасль" />
+        <input v-model="newCompany.website" placeholder="Сайт" />
+      </div>
+      <button class="primary" @click="editCompany">Сохранить</button>
     </div>
 
     <!-- COMPANY STATUS -->
-    <div class="card row">
+    <div class="card row glass">
       <button class="stop" @click="changeCompanyStatus(1)">Остановить работу</button>
       <button class="start" @click="changeCompanyStatus(0)">Возобновить работу</button>
     </div>
 
     <!-- MULTI-CHARTS -->
-    <div class="card" v-if="charts.length">
+    <div class="card glass" v-if="charts.length">
       <h2>{{ charts[currentChart].title }}</h2>
 
       <img :src="charts[currentChart].img" class="chart-img" />
@@ -107,7 +126,7 @@
 
 
     <!-- REVIEWS FILTER -->
-    <div class="card">
+    <div class="card glass">
       <h2>Отзывы</h2>
 
       <div class="reviews-buttons">
@@ -139,7 +158,7 @@
     </div>
 
     <!-- REPORT BUTTON -->
-    <div class="card">
+    <div class="card glass">
       <button @click="generateReport" class="report-btn">Скачать отчёт</button>
     </div>
 
@@ -358,171 +377,133 @@ onMounted(() => {
 
 <style scoped>
 .page-container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: "Inter", sans-serif;
+  padding: 28px 18px 64px;
+  color: var(--text);
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.back {
-  text-decoration: none;
-  color: #1976d2;
-  font-weight: 600;
-  position: absolute;
-  left: 20px;
-}
-
-h1 {
-  margin-bottom: 6px;
-}
-.subtitle {
-  color: #555;
-  margin-bottom: 20px;
-}
-
-.card {
-  background: white;
-  padding: 18px 22px;
-  border-radius: 12px;
-  margin-bottom: 22px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
-.company-info .info-row {
+.hero {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+  margin-bottom: 18px;
 }
+
+.pill {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 6px 0 0; }
+h1 { margin: 4px 0 6px; }
+.subtitle { color: #cdd6e3; margin: 0; }
+.status { padding: 8px 14px; background: rgba(37, 99, 235, 0.18); border: 1px solid rgba(37, 99, 235, 0.4); border-radius: 12px; font-weight: 700; }
+
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  border-radius: 18px;
+  padding: 18px 16px;
+  backdrop-filter: blur(14px);
+}
+
+.card { margin-bottom: 18px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.badge { padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.label { color: #9fb3d4; font-size: 0.9rem; }
+.value { margin: 4px 0 0; font-weight: 600; }
 
 .otzovik-btn {
-  margin-top: 12px;
+  margin-top: 14px;
   display: inline-block;
-  padding: 8px 14px;
-  background: #1976d2;
-  color: white;
-  border-radius: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: var(--text);
+  border-radius: 12px;
   text-decoration: none;
-}
-.otzovik-btn:hover {
-  background: #1258a8;
-}
-
-.users-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
 }
 
-.user-card {
-  background: #f5f8ff;
-  padding: 12px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.users-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.user-card { padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; }
+.role { font-size: 0.9rem; margin-top: 4px; color: #bfdbfe; }
+.manage-block { display: flex; gap: 12px; align-items: flex-end; }
+.manage-block select { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05); color: var(--text); }
 
-.role {
-  font-size: 0.85rem;
-  margin-top: 3px;
-}
-.role-admin { color: #1976d2; }
-.role-user { color: #555; }
-
-.manage-block {
-  display: flex;
-  gap: 14px;
-}
-
-.manage-block select {
-  padding: 5px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.add-user {
-  margin-top: 15px;
-  display: flex;
-  gap: 12px;
-}
-
-.add-user input {
+.add-user { margin-top: 14px; display: flex; gap: 10px; }
+.add-user input,
+.edit-grid input {
   flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
 }
 
-button {
-  padding: 8px 14px;
+.primary,
+.ghost,
+.stop,
+.start,
+.chart-pagination button,
+.report-btn,
+.reviews-buttons button {
   border: none;
-  border-radius: 6px;
-  background: #1976d2;
-  color: white;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
   cursor: pointer;
+  color: var(--text);
   transition: 0.2s;
 }
-button:hover {
-  background: #1258a8;
-}
 
-.stop {
-  background: #d32f2f;
-}
-.start {
-  background: #388e3c;
-}
+.primary { background: linear-gradient(135deg, #2563eb, #7c3aed); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3); }
+.ghost { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+.stop { background: #dc2626; }
+.start { background: #16a34a; }
+.chart-pagination button { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+.report-btn { width: 100%; background: #0f172a; }
 
-.reviews-buttons {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.primary:hover { transform: translateY(-1px); }
+.ghost:hover,
+.chart-pagination button:hover { border-color: rgba(255, 255, 255, 0.2); }
 
-.review-item {
-  background: #f7f7f7;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
+.reviews-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.reviews-buttons button { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); }
+.reviews-buttons .all { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; }
 
-.chart-img {
-  max-width: 100%;
-  border-radius: 10px;
-}
+.review-item { background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.08); }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 12px;
-}
-.chart-pagination {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 12px;
-  align-items: center;
-}
+.chart-img { max-width: 100%; border-radius: 12px; }
 
-.chart-pagination button {
-  padding: 6px 12px;
-  background: #1976d2;
-  color: white;
-  border-radius: 6px;
-}
+.pagination,
+.chart-pagination { display: flex; justify-content: center; gap: 14px; margin-top: 12px; align-items: center; }
 
-.chart-pagination button:disabled {
-  background: #90caf9;
-  cursor: not-allowed;
-}
+.chart-pagination button:disabled { background: rgba(255, 255, 255, 0.08); opacity: 0.6; cursor: not-allowed; }
 
-.report-btn {
-  width: 100%;
-  background: #37474f;
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 10px 0 12px; }
+
+@media (max-width: 640px) {
+  .hero { flex-direction: column; }
+  .manage-block { flex-direction: column; align-items: flex-start; }
 }
 </style>
