@@ -32,7 +32,17 @@
         </div>
         <div>
           <span class="label">Сайт</span>
-          <p class="value">{{ company.website || 'Не указан' }}</p>
+          <p class="value" v-if="company.website">
+            <a
+                :href="websiteLink"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link"
+            >
+              {{ company.website }}
+            </a>
+          </p>
+          <p class="value" v-else>Не указан</p>
         </div>
       </div>
 
@@ -227,6 +237,13 @@ const reviewSearchLoading = ref(false);
 
 const currentPage = ref(1);
 const pageSize = 6;
+
+const websiteLink = computed(() => {
+  const raw = company.value?.website?.trim();
+  if (!raw) return null;
+
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+});
 
 const newCompany = reactive({
   industryName: "",
@@ -608,6 +625,13 @@ h1 { margin: 4px 0 6px; }
 }
 
 .status-text { color: #9fb3d4; margin: 0; }
+
+.link {
+  color: #bfdbfe;
+  text-decoration: underline;
+  text-decoration-color: rgba(37, 99, 235, 0.6);
+  text-decoration-thickness: 2px;
+}
 
 .review-item { background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.08); }
 
