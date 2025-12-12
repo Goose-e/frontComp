@@ -79,7 +79,7 @@
 
 
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, reactive, ref} from "vue";
 import api from "../api/http.js";
 import {useRouter} from "vue-router";
 
@@ -115,9 +115,12 @@ const clickCount = ref(0);
 const incrementClicks = () => {
   clickCount.value++;
 };
-const safeTop = rect.bottom + 24;
-const screenMiddle = window.innerHeight / 2;
-centerTop.value = Math.max(safeTop, screenMiddle);
+const updateCenterTop = () => {
+  const rect = profileEl.value?.getBoundingClientRect();
+  const safeTop = rect ? rect.bottom + 24 : 200;
+  const screenMiddle = window.innerHeight / 2;
+  centerTop.value = Math.max(safeTop, screenMiddle);
+};
 const funText = computed(() => {
   if (loading.value) return "";
   if (clickCount.value === 0) return "Нажми кнопку";
