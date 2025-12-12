@@ -107,8 +107,8 @@
 
     <!-- COMPANY STATUS -->
     <div class="card row glass">
-      <button class="stop" @click="changeCompanyStatus(1)">Остановить работу</button>
-      <button class="start" @click="changeCompanyStatus(0)">Возобновить работу</button>
+      <button class="stop" @click="changeCompanyStatus(1)">Удалить компанию</button>
+      <button class="start" @click="changeCompanyStatus(0)">Восстановить компанию</button>
     </div>
 
     <!-- MULTI-CHARTS -->
