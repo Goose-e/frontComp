@@ -4,9 +4,6 @@
     <div class="orb second"></div>
 
     <div class="registration-card">
-      <div class="logo-icon">
-        <img src="../../logoicon_ready.png" alt="Logo-icon" height="60" />
-      </div>
 
       <p class="eyebrow">Создайте аккаунт</p>
       <h1 class="title">Присоединяйтесь к платформе</h1>
@@ -223,15 +220,6 @@ const addUser = async () => {
   backdrop-filter: blur(18px);
   position: relative;
   z-index: 1;
-}
-
-.logo-icon {
-  position: absolute;
-  top: -32px;
-  left: 26px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 12px;
-  border-radius: 14px;
 }
 
 .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 0; }

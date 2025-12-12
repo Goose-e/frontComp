@@ -3,9 +3,6 @@
     <div class="glow"></div>
     <div class="glow second"></div>
     <div class="login-card">
-      <div class="logo-icon">
-        <img src="../../logoicon_ready.png" alt="Logo-icon" height="60px" />
-      </div>
 
       <p class="eyebrow">Добро пожаловать</p>
       <h1>Вход в аккаунт</h1>
@@ -181,15 +178,6 @@ const authUser = async () => {
   backdrop-filter: blur(16px);
   z-index: 1;
   text-align: left;
-}
-
-.logo-icon {
-  position: absolute;
-  top: -28px;
-  right: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 10px 14px;
-  border-radius: 12px;
 }
 
 .eyebrow {

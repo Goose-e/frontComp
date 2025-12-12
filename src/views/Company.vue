@@ -210,21 +210,38 @@ const getCompanyByCode = async () => {
 };
 
 /* ============== REVIEWS ============== */
+const normalizeReviewList = (list) =>
+    Array.isArray(list) ? list : Object.values(list ?? {});
+
 const getReviews = async () => {
-  const res = await api.post("review/get_reviews", {
-    companyCode: route.params.code,
-  });
-  reviews.value = res.data.responseEntity.reviewList;
-  currentPage.value = 1;
+  try {
+    const res = await api.post("review/get_reviews", {
+      companyCode: route.params.code,
+    });
+    reviews.value = normalizeReviewList(res.data.responseEntity?.reviewList);
+  } catch (err) {
+    console.error("Не удалось загрузить отзывы", err);
+    reviews.value = [];
+  } finally {
+    currentPage.value = 1;
+  }
 };
 
 const getAllReviewsBySentType = async (sentId) => {
-  const res = await api.post("review/get_reviews_by_sent", {
-    companyCode: route.params.code,
-    sentId,
-  });
-  reviews.value = res.data.responseEntity.reviewsBySentType;
-  currentPage.value = 1;
+  try {
+    const res = await api.post("review/get_reviews_by_sent", {
+      companyCode: route.params.code,
+      sentId,
+    });
+    reviews.value = normalizeReviewList(
+        res.data.responseEntity?.reviewsBySentType
+    );
+  } catch (err) {
+    console.error("Не удалось применить фильтр отзывов", err);
+    reviews.value = [];
+  } finally {
+    currentPage.value = 1;
+  }
 };
 
 const paginatedReviews = computed(() => {
@@ -336,21 +353,35 @@ const generateCharts = async () => {
 
 
 const generateReport = async () => {
-  const res = await api.post("review/report", {
-    companyCode: route.params.code,
-  });
+  try {
+    const res = await api.post(
+        "review/report",
+        {
+          companyCode: route.params.code,
+        },
+        { responseType: "arraybuffer" }
+    );
 
-  const base64 = res.data.responseEntity.reportImg;
-  const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    let blob;
+    if (res.data instanceof ArrayBuffer) {
+      blob = new Blob([res.data], { type: "application/pdf" });
+    } else {
+      const base64 = res.data.responseEntity?.reportImg;
+      if (!base64) throw new Error("Нет данных отчёта");
 
-  const blob = new Blob([byteArray], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
+      const byteArray = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      blob = new Blob([byteArray], { type: "application/pdf" });
+    }
 
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "report.pdf";
-  link.click();
-  URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "report.pdf";
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Не удалось скачать отчёт", err);
+  }
 };
 
 
