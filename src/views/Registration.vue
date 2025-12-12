@@ -1,37 +1,50 @@
 <template>
   <div class="registration-container">
-    <div class="registration-card">
+    <div class="orb"></div>
+    <div class="orb second"></div>
 
+    <div class="registration-card">
       <div class="logo-icon">
         <img src="../../logoicon_ready.png" alt="Logo-icon" height="60" />
       </div>
 
-      <h1 class="title">Регистрация</h1>
+      <p class="eyebrow">Создайте аккаунт</p>
+      <h1 class="title">Присоединяйтесь к платформе</h1>
+      <p class="muted">Следите за компаниями, формируйте отчёты и управляйте пользователями.</p>
 
       <div class="form">
-        <input
-            v-model="newUser.name"
-            type="text"
-            placeholder="Логин"
-            class="form-input"
-        />
-        <p v-if="errorUsername" class="error-message">{{ errorUsername }}</p>
+        <div class="input-control">
+          <label>Логин</label>
+          <input
+              v-model="newUser.name"
+              type="text"
+              placeholder="Введите логин"
+              class="form-input"
+          />
+          <p v-if="errorUsername" class="error-message">{{ errorUsername }}</p>
+        </div>
 
-        <input
-            v-model="newUser.email"
-            type="email"
-            placeholder="Email"
-            class="form-input"
-        />
-        <p v-if="errorEmail" class="error-message">{{ errorEmail }}</p>
+        <div class="input-control">
+          <label>Email</label>
+          <input
+              v-model="newUser.email"
+              type="email"
+              placeholder="you@example.com"
+              class="form-input"
+          />
+          <p v-if="errorEmail" class="error-message">{{ errorEmail }}</p>
+        </div>
 
-        <input
-            v-model="newUser.password"
-            type="password"
-            placeholder="Пароль (мин. 8 символов)"
-            class="form-input"
-        />
-        <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
+        <div class="input-control">
+          <label>Пароль</label>
+          <input
+              v-model="newUser.password"
+              type="password"
+              placeholder="Минимум 8 символов"
+              class="form-input"
+          />
+          <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
+        </div>
 
         <button
             :disabled="loading || !!passwordError"
@@ -43,17 +56,15 @@
         </button>
       </div>
 
-      <p>
+      <div class="links">
         <router-link :to="{ name : 'authorization'}" class="login-link">
           Уже есть аккаунт? Войти
         </router-link>
-      </p>
 
-      <p>
         <router-link :to="{ name : 'main'}" class="login-link">
           На главную
         </router-link>
-      </p>
+      </div>
 
     </div>
   </div>
@@ -160,96 +171,115 @@ const addUser = async () => {
 
 <style scoped>
 .registration-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.3), transparent 55%);
+  filter: blur(28px);
+  top: -160px;
+  left: -140px;
+  z-index: 0;
+}
+
+.orb.second {
+  bottom: -200px;
+  right: -160px;
+  left: auto;
+  top: auto;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.35), transparent 55%);
 }
 
 .registration-card {
   width: 100%;
-  max-width: 400px;
-  background: #ffffff;
-  padding: 3rem 2.5rem 2rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 22px;
+  padding: 34px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(18px);
   position: relative;
+  z-index: 1;
 }
 
 .logo-icon {
   position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -32px;
+  left: 26px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px;
+  border-radius: 14px;
 }
 
-.title {
-  margin-top: 2.5rem;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-  color: #333;
-}
+.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 0; }
+.muted { color: #cdd6e3; margin: 6px 0 16px; }
+.title { margin: 8px 0; }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+.form { display: grid; gap: 14px; margin-top: 12px; }
+.input-control { display: flex; flex-direction: column; gap: 6px; }
+.input-control label { color: #cdd6e3; font-size: 0.95rem; }
 
 .form-input {
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.25s;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  transition: 0.2s;
 }
 
 .form-input:focus {
-  border-color: #1976d2;
-  box-shadow: 0 0 5px rgba(25, 118, 210, 0.4);
   outline: none;
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
 .submit-button {
-  padding: 0.8rem;
-  background: #1976d2;
-  color: white;
+  padding: 12px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: var(--text);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: bold;
-  transition: background 0.3s;
+  font-weight: 700;
+  transition: transform 0.25s;
+  box-shadow: 0 15px 34px rgba(37, 99, 235, 0.35);
 }
 
-.submit-button:hover:not(:disabled) {
-  background: #1565c0;
-}
+.submit-button:hover:not(:disabled) { transform: translateY(-1px); }
 
 .submit-button:disabled {
-  background: #90caf9;
+  background: rgba(255, 255, 255, 0.2);
   cursor: not-allowed;
 }
 
-.login-link {
-  margin-top: 1.3rem;
-  display: block;
-  color: #1976d2;
-  text-decoration: none;
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
 }
 
-.login-link:hover {
-  color: #0d47a1;
+.login-link {
+  color: #bfdbfe;
+  text-decoration: none;
+  font-weight: 600;
 }
+
+.login-link:hover { color: #e0f2fe; }
 
 .error-message {
-  color: #d32f2f;
-  font-size: 0.85rem;
-  text-align: left;
-  padding-left: 2px;
-  margin-top: -0.5rem;
+  color: #fca5a5;
+  font-size: 0.9rem;
 }
 </style>
 

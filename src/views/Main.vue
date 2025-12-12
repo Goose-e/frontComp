@@ -1,71 +1,95 @@
 <template>
-  <div class="header">
-    <div class="right-block">
-      <router-link
-          v-if="!isAuthorized"
-          :to="{ name: 'authorization' }"
-          class="nonAuthorized"
-      >
-        Войти
-      </router-link>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">Insight<span>Hub</span></div>
 
-      <div v-else class="authorized-left">
-        <router-link :to="{ name: 'profil' }" class="go-profil">
-          В профиль
-        </router-link>
-      </div>
-      <div class="company-search">
-        <input
-            v-model="searchText"
-            type="text"
-            placeholder="Введите название или код компании…"
-            @keyup.enter="searchCompany"
-        />
-        <button @click="searchCompany">Поиск</button>
-        <button v-if="searchText" @click="resetSearch">Сброс</button>
-      </div>
-
-    </div>
-
-    <div class="right-block" v-if="isAuthorized">
-      <button @click="openCreateForm">Создать компанию</button>
-      <button @click="exit">Выйти</button>
-    </div>
-  </div>
-
-  <hr />
-
-  <!-- Поиск -->
-
-
-  <!-- Лоадер -->
-  <div class="loader" v-if="loading">Загрузка...</div>
-
-  <div class="middle" v-else>
-    <p v-if="!allCompaniesGet.length">Компаний нету</p>
-
-    <ul v-else>
-      <li
-          v-for="company in allCompaniesGet"
-          :key="company.companyCode"
-          @click="toCompanyPage(company.companyCode)"
-      >
-        <div class="info">
-          <h3>{{ company.companyName }}</h3>
-        </div>
-
-        <a
-            v-if="company.otzovikUrl !== 'не найдено'"
-            :href="company.otzovikUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="otzovik-link"
-            @click.stop
+      <div class="nav-actions">
+        <router-link
+            v-if="!isAuthorized"
+            :to="{ name: 'authorization' }"
+            class="ghost-btn"
         >
-          Отзовик
-        </a>
-      </li>
-    </ul>
+          Войти
+        </router-link>
+
+        <div v-else class="authorized">
+          <router-link :to="{ name: 'profil' }" class="ghost-btn">
+            Профиль
+          </router-link>
+          <button class="ghost-btn" @click="openCreateForm">
+            Создать компанию
+          </button>
+          <button class="ghost-btn danger" @click="exit">Выйти</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">Аналитика и контроль</p>
+        <h1>Находите компании и управляйте ими в одном месте</h1>
+        <p class="subtitle">
+          Быстрый поиск, навигация по отзывам и доступ ко всем вашим проектам через
+          современный интерфейс.
+        </p>
+      </div>
+
+      <div class="search-card">
+        <div class="input-wrap">
+          <input
+              v-model="searchText"
+              type="text"
+              placeholder="Введите название или код компании…"
+              @keyup.enter="searchCompany"
+          />
+          <button class="primary" @click="searchCompany">Поиск</button>
+          <button v-if="searchText" class="secondary" @click="resetSearch">Сброс</button>
+        </div>
+        <p class="hint">Нажмите Enter или кнопку «Поиск», чтобы увидеть результаты.</p>
+      </div>
+    </section>
+
+    <section class="content" v-if="!loading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Каталог</p>
+          <h2>Все компании</h2>
+        </div>
+        <span class="pill" v-if="allCompaniesGet.length">{{ allCompaniesGet.length }} найдено</span>
+      </div>
+
+      <p v-if="!allCompaniesGet.length" class="muted">Компаний нет</p>
+
+      <div v-else class="cards">
+        <article
+            v-for="company in allCompaniesGet"
+            :key="company.companyCode"
+            class="company-card"
+            @click="toCompanyPage(company.companyCode)"
+        >
+          <div>
+            <h3>{{ company.companyName }}</h3>
+            <p class="code">Код: {{ company.companyCode }}</p>
+          </div>
+
+          <a
+              v-if="company.otzovikUrl !== 'не найдено'"
+              :href="company.otzovikUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link"
+              @click.stop
+          >
+            Отзовик
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <div class="loader" v-else>
+      <div class="spinner"></div>
+      <p>Загружаем компании...</p>
+    </div>
   </div>
 </template>
 
@@ -151,144 +175,197 @@ onMounted(() => {
   getAllCompanies();
 });
 </script>
-
 <style scoped>
-.header {
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  color: var(--text);
+}
+
+.topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: #1976d2;
-  color: white;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: linear-gradient(120deg, rgba(37, 99, 235, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(18px);
 }
 
-.right-block {
-  display: flex;
+.brand {
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+.brand span { color: var(--accent); }
+
+.nav-actions { display: flex; gap: 10px; }
+
+.authorized { display: flex; gap: 10px; align-items: center; }
+
+.hero {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
   align-items: center;
-  gap: 1rem;
 }
 
-/* Кнопки */
-button {
-  background: white;
-  color: #1976d2;
-  border: none;
-  padding: 0.5rem 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-  font-weight: bold;
-}
+.hero-text h1 { margin: 8px 0 10px; font-size: 2.2rem; }
+.subtitle { color: #cfd7e3; line-height: 1.6; }
 
-button:hover {
-  background: #e3f2fd;
-}
-
-/* Ссылки */
-.go-profil,
-.nonAuthorized {
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.nonAuthorized:hover,
-.go-profil:hover {
-  color: #bbdefb;
-}
-
-hr {
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: #94a3b8;
   margin: 0;
-  border: none;
-  border-top: 2px solid #bbdefb;
 }
 
-.company-search {
-  justify-content: center;
-  align-items: center;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1rem 2rem;
+.search-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(16px);
+}
+
+.input-wrap {
   display: flex;
-  gap: 1rem;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.company-search input {
-
+.input-wrap input {
   flex: 1;
-  font-size: 1rem;
-  max-width: 300px;
-  background-color: #f5f5f5;
-  color: #242424;
-  padding: .15rem .5rem;
-  min-height: 40px;
-  border-radius: 4px;
-  outline: none;
-  border: none;
-  line-height: 1.15;
-  box-shadow: 0px 10px 20px -18px;
-}
-.company-search input:focus {
-  border-bottom: 2px solid #5b5fc7;
-  border-radius: 4px 4px 2px 2px;
-}
-
-.company-search input:hover {
-  outline: 1px solid lightgrey;
-}
-.middle {
-  padding: 2rem;
-  background: #e3f2fd;
-  min-height: calc(100vh - 140px);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  background: white;
-  padding: 1rem;
-  border-radius: 14px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
+  min-width: 240px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
   transition: 0.2s;
 }
 
-li:hover {
-  transform: scale(1.01);
+.input-wrap input:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
-.info h3 {
-  margin: 0;
+.primary,
+.secondary,
+.ghost-btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+  transition: 0.25s;
+  color: var(--text);
 }
 
-.info small {
-  color: #666;
-  font-size: 0.85rem;
+.primary {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
 }
+.primary:hover { transform: translateY(-1px); }
+
+.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.ghost-btn.danger { color: #fca5a5; border-color: rgba(248, 113, 113, 0.3); }
+
+.ghost-btn:hover,
+.secondary:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hint { color: #94a3b8; margin-top: 8px; }
+
+.content { margin-top: 28px; }
+
+.section-head { display: flex; justify-content: space-between; align-items: center; }
+.section-head h2 { margin: 6px 0 0; }
+
+.pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+}
+
+.muted { color: #94a3b8; }
+
+.cards {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.company-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+}
+
+.company-card:hover { transform: translateY(-4px); border-color: rgba(37, 99, 235, 0.4); }
+
+.code { color: #9db2cc; margin: 6px 0 0; }
+
+.link {
+  margin-top: 10px;
+  display: inline-block;
+  color: #bfdbfe;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link:hover { color: #e0f2fe; }
 
 .loader {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 20px;
+  color: #cbd5e1;
 }
 
-.otzovik-link {
-  background-color: #1976d2;
-  color: white;
-  text-decoration: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.otzovik-link:hover {
-  background-color: #1565c0;
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; gap: 10px; }
+  .nav-actions { width: 100%; justify-content: flex-end; }
 }
 </style>

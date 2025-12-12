@@ -1,12 +1,18 @@
 <template>
   <div class="login-container">
+    <div class="glow"></div>
+    <div class="glow second"></div>
     <div class="login-card">
       <div class="logo-icon">
         <img src="../../logoicon_ready.png" alt="Logo-icon" height="60px" />
       </div>
 
-      <h1>Вход</h1>
+      <p class="eyebrow">Добро пожаловать</p>
+      <h1>Вход в аккаунт</h1>
+      <p class="muted">Продолжайте работу и управляйте компаниями без ограничений.</p>
+
       <div class="input-group">
+        <label>Логин или email</label>
         <input
           v-model="newUser.login"
           type="text"
@@ -14,6 +20,7 @@
         />
       </div>
       <div class="input-group">
+        <label>Пароль</label>
         <input
           v-model="newUser.password"
           type="password"
@@ -21,19 +28,16 @@
         />
       </div>
 
-      <button @click="authUser">Войти</button>
+      <button @click="authUser" class="primary">Войти</button>
 
-      <p>
-        <router-link :to="{ name: 'registration' }" class="register-link">
+      <div class="links">
+        <router-link :to="{ name: 'registration' }" class="link">
           Нет аккаунта? Регистрация
         </router-link>
-      </p>
-
-      <p>
-        <router-link :to="{ name: 'main' }" class="register-link">
+        <router-link :to="{ name: 'main' }" class="link">
           На главную
         </router-link>
-      </p>
+      </div>
     </div>
   </div>
 </template>
@@ -138,97 +142,119 @@ const authUser = async () => {
 
 <style scoped>
 .login-container {
-  height: 100vh; /* или 100% при нужной структуре */
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(145deg, #e3f2fd, #bbdefb); /* или нужный фон */
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  position: relative;
+  overflow: hidden;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background-color: #000000; /* подставь нужный фон */
+.glow {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.35), transparent 60%);
+  filter: blur(20px);
+  top: -80px;
+  left: -120px;
+  z-index: 0;
 }
 
-/* Убедимся, что #app занимает всю высоту */
-#app {
-  height: 100%;
+.glow.second {
+  right: -120px;
+  left: auto;
+  top: auto;
+  bottom: -140px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3), transparent 60%);
 }
 
 .login-card {
   width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  padding: 32px 28px;
   position: relative;
-  max-width: 400px;
-  background-color: #ffffff;
-  padding: 5% 4% 3% 4%;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.login-card h1 {
-  margin-bottom: 2rem;
-  color: #333;
-  font-size: 1.8rem;
-}
-
-.input-group {
-  margin-bottom: 1.2rem;
-}
-
-input {
-  width: 93%;
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-button {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-button:hover {
-  background-color: #1565c0;
-}
-
-.register-link {
-  display: block;
-  margin-top: 1.5rem;
-  color: #1976d2;
-  text-decoration: none;
-  font-size: 0.95rem;
-  transition: color 0.3s;
-}
-
-.register-link:hover {
-  color: #0d47a1;
+  backdrop-filter: blur(16px);
+  z-index: 1;
+  text-align: left;
 }
 
 .logo-icon {
   position: absolute;
-  top: 5%;
-  right: 39%;
+  top: -28px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 12px;
 }
 
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: #9fb3d4;
+  margin: 0;
+}
+
+h1 { margin: 6px 0 6px; }
+.muted { color: #cdd6e3; margin-bottom: 20px; }
+
+.input-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+.input-group label { color: #cdd6e3; font-size: 0.95rem; }
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  transition: 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.primary {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 15px 35px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s;
+  margin-top: 6px;
+}
+
+.primary:hover { transform: translateY(-1px); }
+
+.links {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.link {
+  color: #bfdbfe;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link:hover { color: #e0f2fe; }
+
 .error-message {
-  color: red;
-  font-size: 0.85rem;
-  text-align: left;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
-  padding-left: 0.3rem;
+  color: #fca5a5;
+  font-size: 0.9rem;
 }
 </style>

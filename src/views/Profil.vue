@@ -1,50 +1,67 @@
 <template>
-  <div class="header">
-    <router-link :to="{ name: 'main' }">На главную</router-link>
-    <router-link :to="{ name: 'UserCompanies' }">
-      Компании пользователя
-    </router-link>
-  </div>
+  <div class="profile">
+    <header class="page-header">
+      <router-link :to="{ name: 'main' }" class="pill">← На главную</router-link>
+      <router-link :to="{ name: 'UserCompanies' }" class="pill">Компании пользователя</router-link>
+    </header>
 
-  <div class="welcome">
-    <p v-if="userInfo">Привет, <b>{{ userInfo.username }}</b>!</p>
-    <p v-if="userInfo">Почта: {{ userInfo.email }}</p>
-  </div>
+    <section class="welcome">
+      <div class="avatar">{{ userInitials }}</div>
+      <div>
+        <p class="eyebrow">Аккаунт</p>
+        <h1 v-if="userInfo">{{ userInfo.username }}</h1>
+        <p v-if="userInfo" class="muted">{{ userInfo.email }}</p>
+      </div>
+    </section>
 
-  <div class="user-change">
-    <h2>Изменить данные профиля</h2>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <p class="eyebrow">Настройки</p>
+          <h2>Изменить данные профиля</h2>
+        </div>
+        <span class="tag">Безопасность</span>
+      </div>
 
-    <input
-        v-model="editUserForm.newUsername"
-        type="text"
-        placeholder="Новое имя (необязательно)"
-        class="form-input"
-    />
-    <p v-if="errorUsername" class="error">{{ errorUsername }}</p>
+      <div class="form-grid">
+        <div>
+          <label>Новое имя</label>
+          <input
+              v-model="editUserForm.newUsername"
+              type="text"
+              placeholder="Новое имя (необязательно)"
+              class="form-input"
+          />
+          <p v-if="errorUsername" class="error">{{ errorUsername }}</p>
+        </div>
 
-    <input
-        v-model="editUserForm.newEmail"
-        type="email"
-        placeholder="Новый Email (необязательно)"
-        class="form-input"
-    />
-    <p v-if="errorEmail" class="error">{{ errorEmail }}</p>
+        <div>
+          <label>Новый email</label>
+          <input
+              v-model="editUserForm.newEmail"
+              type="email"
+              placeholder="Новый Email (необязательно)"
+              class="form-input"
+          />
+          <p v-if="errorEmail" class="error">{{ errorEmail }}</p>
+        </div>
+      </div>
 
-    <button
-        :disabled="loading"
-        @click="editUser"
-    >
-      <span v-if="!loading">Сохранить изменения</span>
-      <span v-else>Сохранение...</span>
-    </button>
+      <div class="actions">
+        <button :disabled="loading" @click="editUser" class="primary">
+          <span v-if="!loading">Сохранить изменения</span>
+          <span v-else>Сохранение...</span>
+        </button>
 
-    <button class="secondary" @click="resetForm">Сбросить</button>
+        <button class="ghost" @click="resetForm">Сбросить</button>
+      </div>
+    </div>
   </div>
 </template>
 
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import api from "../api/http.js";
 import { useRouter } from "vue-router";
 
@@ -60,6 +77,14 @@ const editUserForm = reactive({
 const errorUsername = ref("");
 const errorEmail = ref("");
 const loading = ref(false);
+const userInitials = computed(() => {
+  if (!userInfo.value?.username) return "";
+  return userInfo.value.username
+      .split(" ")
+      .map((w) => w[0]?.toUpperCase())
+      .join("")
+      .slice(0, 2);
+});
 
 const isValidEmail = (email) => {
   if (!email) return true;
@@ -133,92 +158,133 @@ onMounted(() => {
 
 
 <style scoped>
-.header {
+.profile {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 20px 64px;
+  color: var(--text);
+}
+
+.page-header {
   display: flex;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  background: #1976d2;
-  color: white;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.header a {
-  color: white;
+.pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
+  color: var(--text);
+  font-weight: 600;
 }
 
-.header a:hover {
-  color: #bbdefb;
-}
+.pill:hover { border-color: rgba(255, 255, 255, 0.2); }
 
 .welcome {
-  padding: 2rem;
-  background: #e3f2fd;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: white;
   font-size: 1.2rem;
 }
 
-.user-change {
-  max-width: 450px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3d4; margin: 0; }
+.muted { color: #cdd6e3; margin: 6px 0 0; }
+
+.card {
+  margin-top: 18px;
+  padding: 20px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
 }
 
-.user-change h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.card-header h2 { margin: 6px 0 0; }
+
+.tag {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
 }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+label { color: #cdd6e3; font-size: 0.95rem; }
 
 .form-input {
   width: 100%;
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  margin-top: 6px;
+  transition: 0.2s;
 }
 
-button {
-  width: 100%;
-  padding: 0.8rem;
-  background: #1976d2;
-  color: white;
+.form-input:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.actions { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+.primary, .ghost {
+  padding: 12px 16px;
+  border-radius: 12px;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
-  font-weight: bold;
-  margin-top: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  transition: 0.2s;
 }
 
-button:hover:not(:disabled) {
-  background: #1565c0;
+.primary {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
 }
 
-button:disabled {
-  background: #90caf9;
-  cursor: not-allowed;
+.ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.secondary {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.secondary:hover {
-  background: #d5d5d5;
-}
+.primary:hover { transform: translateY(-1px); }
+.ghost:hover { border-color: rgba(255, 255, 255, 0.2); }
 
 .error {
-  color: #d32f2f;
+  color: #fca5a5;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  padding-left: 3px;
+  margin-top: 4px;
 }
 </style>
 
